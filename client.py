@@ -34,12 +34,15 @@ class App(customtkinter.CTk):
 
         self.my_font = customtkinter.CTkFont(family="Arial", size=16, weight="normal")
         self.entry = customtkinter.CTkEntry(self, font=self.my_font)
-        self.entry.place(rely=0.9, relx=0.5, anchor="center", relwidth=0.8, relheight=0.05)
-        self.entry.bind("<Return>", self.on_enter)
+        self.entry.place(rely=0.9, relx=0.1, anchor="w", relwidth=0.7, relheight=0.05)
+        self.entry.bind("<Return>", self.send_and_clear)
+
+        self.send_button = customtkinter.CTkButton(self, font=self.my_font, text="submit", command=self.send_and_clear)
+        self.send_button.place(rely=0.90, relx=0.85, relwidth=0.1, relheight=0.05, anchor="center")
 
         threading.Thread(target=self.get_message).start()
 
-    def on_enter(self, event=None):
+    def send_and_clear(self, event=None):
         message = self.entry.get()
         self.entry.delete(0, "end")
         self.send_message(message)
@@ -47,7 +50,7 @@ class App(customtkinter.CTk):
     def get_message(self):
         while True:
             message = self.client.recv(1024).decode()
-            label = customtkinter.CTkLabel(self.frame, text=message, font=self.my_font)
+            label = customtkinter.CTkLabel(self.frame, text=message, font=self.my_font, wraplength=600, justify="left")
             label.pack(anchor="w")
 
 
