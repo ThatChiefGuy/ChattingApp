@@ -3,13 +3,10 @@ import threading
 import json
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-<<<<<<< HEAD
+
 server.bind(("192.168.1.100", 9999))
 server.listen(3)
-=======
-server.bind(("192.168.1.104", 9999))
-server.listen(5)
->>>>>>> bf504351a10339dcd327895f4ba05c82c07c4416
+
 clients = {}
 
 def encode(message):
