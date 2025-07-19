@@ -3,7 +3,7 @@ import threading
 import json
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind(("192.168.1.104", 9999))
+server.bind(("192.168.1.100", 9999))
 server.listen(3)
 clients = {}
 
@@ -22,7 +22,6 @@ def handle_messages(client, address):
 
     while True:
         client_response = decode(client.recv(1024))
-        print(client_response)
         if client_response["type"] == "chat":
             for user in clients.keys():
                 user.send(encode({"type":"chat","message":f"{name}: {client_response['message']}"}))

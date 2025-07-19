@@ -5,7 +5,7 @@ import json
 from tkinter import messagebox
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect(("192.168.1.104", 9999))
+client.connect(("192.168.1.100", 9999))
 
 def encode(message):
     return json.dumps(message).encode()
