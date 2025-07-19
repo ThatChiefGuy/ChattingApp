@@ -4,7 +4,7 @@ import json
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(("192.168.1.104", 9999))
-server.listen(3)
+server.listen(5)
 clients = {}
 
 def encode(message):
@@ -13,19 +13,33 @@ def encode(message):
 def decode(message):
     return json.loads(message.decode())
 
+def broadcast_message(message_type, message, clients):
+    for user in list(clients.keys()):
+        try:
+            user.send(encode({"type": message_type, "message": message}))
+        except ConnectionError:
+            user.close()
+            del clients[user]
+            for user in clients:
+                name = clients.get(user, "Unknown")
+                user.close()
+                for other_user in list(clients.keys()):
+                    try:
+                        other_user.send(encode({"type": "chat", "message": f"{name} left the chat"}))
+                    except:
+                        pass  # Optional: handle double-fail silently
+
 def handle_messages(client, address):
-    print(f"[NEW CLIENT] {address}, connected")
     name_data = decode(client.recv(1024))
     if name_data["type"] == "name":
         name = name_data["message"]
         clients[client] = name
+        broadcast_message("chat", f"server: {name} joined the chat", clients)
 
     while True:
         client_response = decode(client.recv(1024))
-        print(client_response)
         if client_response["type"] == "chat":
-            for user in clients.keys():
-                user.send(encode({"type":"chat","message":f"{name}: {client_response['message']}"}))
+            broadcast_message("chat", f"{name}: {client_response['message']}", clients)
 
 while True:
     client, address, = server.accept()
