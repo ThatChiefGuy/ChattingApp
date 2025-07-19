@@ -38,17 +38,21 @@ class App(customtkinter.CTk):
         self.client = client
         self.geometry("800x600")
 
-        self.frame = customtkinter.CTkScrollableFrame(self)
-        self.frame.place(rely=0.05, relx=0.5, anchor="n", relheight=0.7, relwidth=0.8)
+        self.chat_frame = customtkinter.CTkScrollableFrame(self)
+        self.chat_frame.place(rely=0.05, relx=0.25, anchor="nw", relheight=0.7, relwidth=0.7)
 
         self.my_font = customtkinter.CTkFont(family="Arial", size=16, weight="normal")
         self.entry = customtkinter.CTkEntry(self, font=self.my_font)
-        self.entry.place(rely=0.9, relx=0.1, anchor="w", relwidth=0.7, relheight=0.05)
+        self.entry.place(rely=0.9, relx=0.25, anchor="w", relwidth=0.6, relheight=0.05)
         self.entry.bind("<Return>", self.send_and_clear)
 
-        self.send_button = customtkinter.CTkButton(self, font=self.my_font, text="submit", command=self.send_and_clear)
-        self.send_button.place(rely=0.90, relx=0.85, relwidth=0.1, relheight=0.05, anchor="center")
+        self.send_button = customtkinter.CTkButton(self, font=self.my_font, text="send", command=self.send_and_clear)
+        self.send_button.place(rely=0.90, relx=0.9, relwidth=0.1, relheight=0.05, anchor="center")
 
+        self.online_frame = customtkinter.CTkScrollableFrame(self)
+        self.online_frame.place(rely=0.05, relx=0.025, anchor="nw", relheight=0.9, relwidth=0.2)
+        self.online_users_label = customtkinter.CTkLabel(self.online_frame, text="online users", font=("Arail", 16))
+        self.online_users_label.pack()
         threading.Thread(target=self.get_message).start()
 
     def send_and_clear(self, event=None):
@@ -59,7 +63,8 @@ class App(customtkinter.CTk):
     def get_message(self):
         while True:
             message_data = decode(self.client.recv(1024))
-            label = customtkinter.CTkLabel(self.frame, text=message_data["message"], font=self.my_font, wraplength=600, justify="left")
+
+            label = customtkinter.CTkLabel(self.chat_frame, text=message_data["message"], font=self.my_font, wraplength=600, justify="left")
             label.pack(anchor="w")
 
 
