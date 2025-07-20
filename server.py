@@ -4,7 +4,7 @@ import json
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-server.bind(("192.168.1.100", 9999))
+server.bind(("127.0.0.1", 9999))
 server.listen(3)
 
 clients = {}
@@ -36,12 +36,13 @@ def handle_messages(client, address):
     if name_data["type"] == "name":
         name = name_data["message"]
         clients[client] = name
-        broadcast_message("chat", f"server: {name} joined the chat", clients)
+        broadcast_message("newuser", name, clients)
 
     while True:
         client_response = decode(client.recv(1024))
         if client_response["type"] == "chat":
             broadcast_message("chat", f"{name}: {client_response['message']}", clients)
+
 
 while True:
     client, address, = server.accept()

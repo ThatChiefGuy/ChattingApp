@@ -5,7 +5,7 @@ import json
 from tkinter import messagebox
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect(("192.168.1.100", 9999))
+client.connect(("127.0.0.1", 9999))
 
 def encode(message):
     return json.dumps(message).encode()
@@ -63,10 +63,14 @@ class App(customtkinter.CTk):
     def get_message(self):
         while True:
             message_data = decode(self.client.recv(1024))
-
-            label = customtkinter.CTkLabel(self.chat_frame, text=message_data["message"], font=self.my_font, wraplength=600, justify="left")
-            label.pack(anchor="w")
-
+            if message_data["type"]  == "chat":
+                label = customtkinter.CTkLabel(self.chat_frame, text=message_data["message"], font=self.my_font, wraplength=600, justify="left")
+                label.pack(anchor="w")
+            if message_data["type"] == "newuser":
+                label = customtkinter.CTkLabel(self.online_frame, text=message_data["message"], font=self.my_font, wraplength=600, justify="left")
+                label.pack(anchor="w")
+                new_user_label = customtkinter.CTkLabel(self.chat_frame, text=f"{message_data["message"]} joined the chat", font=self.my_font, wraplength=600, justify="left")
+                new_user_label.pack(anchor="w")
 
     def send_message(self, message_data):
         if message_data is not None:
