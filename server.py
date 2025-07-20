@@ -31,14 +31,16 @@ def handle_messages(client, address):
             name = name_data["message"]
             clients[client] = name
             client.send(encode({"type":"users", "message":list(clients.values())}))
-            broadcast_message("newuser", name, clients)
+            broadcast_message("chat", f"{name} joined the chat", clients)
         while True:
             client_response = decode(client.recv(1024))
             if client_response["type"] == "chat":
                 broadcast_message("chat", f"{name}: {client_response['message']}", clients)
     except ConnectionError:
         del clients[client]
-        broadcast_message("leftuser", name, clients)
+        client.close()
+        broadcast_message("users", clients.values(), clients)
+        print("leftuser ", name)
 
 
 if __name__ == "__main__":

@@ -37,7 +37,7 @@ class App(customtkinter.CTk):
         self.geometry("800x600")
         self.protocol("WM_DELETE_WINDOW", self.on_closign)
         self.chat_frame = customtkinter.CTkScrollableFrame(self)
-        self.chat_frame.place(rely=0.05, relx=0.25, anchor="nw", relheight=0.7, relwidth=0.7)
+        self.chat_frame.place(rely=0.05, relx=0.25, anchor="nw", relheight=0.8, relwidth=0.7)
 
         self.my_font = customtkinter.CTkFont(family="Arial", size=16, weight="normal")
         self.entry = customtkinter.CTkEntry(self, font=self.my_font)
@@ -74,7 +74,7 @@ class App(customtkinter.CTk):
                 if line.strip():
                     message_data = json.loads(line)
 
-            self.handle_messages(message_data)
+                    self.handle_messages(message_data)
 
     def send_message(self, message_data):
         if message_data is not None:
@@ -93,18 +93,6 @@ class App(customtkinter.CTk):
             label = customtkinter.CTkLabel(self.chat_frame, text=message_data["message"], font=self.my_font,
                                            wraplength=600, justify="left")
             label.pack(anchor="w")
-        if message_data["type"] == "newuser":
-            label = customtkinter.CTkLabel(self.online_frame, text=message_data["message"], font=self.my_font,
-                                           wraplength=600, justify="left")
-            label.pack(anchor="w")
-
-            new_user_label = customtkinter.CTkLabel(self.chat_frame, text=f"{message_data["message"]} joined the chat",
-                                                    font=self.my_font, wraplength=600, justify="left")
-            new_user_label.pack(anchor="w")
-        if message_data["type"] == "leftuser":
-            for label in self.online_frame.winfo_children():
-                if label.cget("text") == message_data["message"]:
-                    label.destroy()
 
 if __name__ == "__main__":
     login_window = CreateLoginWindow(client)
