@@ -30,9 +30,8 @@ def handle_messages(client, address):
         if name_data["type"] == "name":
             name = name_data["message"]
             clients[client] = name
-            broadcast_message("newuser", name, clients)
             client.send(encode({"type":"users", "message":list(clients.values())}))
-
+            broadcast_message("newuser", name, clients)
         while True:
             client_response = decode(client.recv(1024))
             if client_response["type"] == "chat":

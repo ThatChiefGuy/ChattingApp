@@ -97,6 +97,7 @@ class App(customtkinter.CTk):
             label = customtkinter.CTkLabel(self.online_frame, text=message_data["message"], font=self.my_font,
                                            wraplength=600, justify="left")
             label.pack(anchor="w")
+
             new_user_label = customtkinter.CTkLabel(self.chat_frame, text=f"{message_data["message"]} joined the chat",
                                                     font=self.my_font, wraplength=600, justify="left")
             new_user_label.pack(anchor="w")
