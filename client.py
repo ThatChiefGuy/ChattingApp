@@ -17,11 +17,12 @@ class CreateLoginWindow(customtkinter.CTk):
         self.client = client
         self.geometry("200x200")
         self.name_entry = customtkinter.CTkEntry(self)
+        self.name_entry.bind("<Return>", self.submit_button_callback)
         self.name_entry.place(relx=0.5, rely=0.3, anchor="center")
         self.submit_button = customtkinter.CTkButton(self, text="submit", command=self.submit_button_callback)
         self.submit_button.place(relx=0.5, rely=0.5, anchor="center")
 
-    def submit_button_callback(self):
+    def submit_button_callback(self, event=None):
         name = {"type":"name", "message":self.name_entry.get()}
         if name["message"].strip():
             self.client.send(encode(name))
