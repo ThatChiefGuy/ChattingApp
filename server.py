@@ -39,19 +39,20 @@ def handle_messages(client, address):
     except ConnectionError:
         del clients[client]
         client.close()
-        broadcast_message("users", clients.values(), clients)
-        print("leftuser ", name)
+        broadcast_message("users", list(clients.values()), clients)
+        broadcast_message("chat", f"{name} left the chat", clients)
 
 
 if __name__ == "__main__":
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    server.bind(("192.168.1.144", 9999))
+    server.bind(("10.79.114.211", 9999))
     server.listen(3)
 
     clients = {}
 
     while True:
+
         client, address, = server.accept()
         thread = threading.Thread(target=handle_messages, args=(client, address))
         thread.start()
