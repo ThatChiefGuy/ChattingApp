@@ -5,7 +5,7 @@ import json
 from tkinter import messagebox
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect(("10.79.114.211", 9999))
+client.connect(("192.168.1.100", 9999))
 
 def encode(message):
     return (json.dumps(message) + "\n").encode()
@@ -52,7 +52,7 @@ class App(customtkinter.CTk):
         self.online_frame.place(rely=0.1, relx=0.025, anchor="nw", relheight=0.85, relwidth=0.2)
         self.online_users_label = customtkinter.CTkLabel(self, text="Online users", font=("Arail", 30))
         self.online_users_label.place(rely=0.05, relx=0.025, anchor="nw")
-        threading.Thread(target=self.get_message).start()
+        threading.Thread(target=self.get_message, daemon=True).start()
 
     def send_and_clear(self, event=None):
         message = {"type":"chat", "message": self.entry.get()}
@@ -68,15 +68,20 @@ class App(customtkinter.CTk):
     def get_message(self):
         buffer = ""
         while True:
-            message_data = self.client.recv(1024).decode()
-            buffer += message_data
-            while "\n" in buffer:
-                line, buffer = buffer.split("\n", 1)
-                if line.strip():
-                    message_data = json.loads(line)
+            try:
+                message_data = self.client.recv(1024).decode()
+                buffer += message_data
+                while "\n" in buffer:
+                    line, buffer = buffer.split("\n", 1)
+                    if line.strip():
+                        message_data = json.loads(line)
 
-                    self.handle_messages(message_data)
-
+                        self.handle_messages(message_data)
+            except (ConnectionAbortedError, ConnectionResetError, ConnectionError):
+                break
+            except json.JSONDecodeError:
+                # Handle or ignore malformed data (optional)
+                pass
     def send_message(self, message_data):
         if message_data is not None:
             self.client.send(encode(message_data))

@@ -9,20 +9,24 @@ def decode(message):
     return json.loads(message.decode())
 
 def broadcast_message(message_type, message, clients):
+    disconnected_users = []
     for user in list(clients.keys()):
         try:
             user.send(encode({"type": message_type, "message": message}))
-        except ConnectionError:
+        except (ConnectionError, ConnectionAbortedError, BrokenPipeError, ConnectionResetError, ConnectionResetError):
             user.close()
-            del clients[user]
-            for user in clients:
-                name = clients.get(user, "Unknown")
-                user.close()
-                for other_user in list(clients.keys()):
-                    try:
-                        other_user.send(encode({"type": "chat", "message": f"{name} left the chat"}))
-                    except:
-                        pass  # Optional: handle double-fail silently
+            disconnected_users.append(user)
+
+        for dead_user in disconnected_users:
+            name = clients.get(dead_user, "Unknown")
+            if dead_user in clients:
+                del clients[dead_user]
+
+            for client in list(clients.keys()):
+                try:
+                    client.send(encode({"type": "chat", "message": f"{name} left the chat"}))
+                except:
+                    pass  # ignore errors
 
 def handle_messages(client, address):
     try:
@@ -30,13 +34,14 @@ def handle_messages(client, address):
         if name_data["type"] == "name":
             name = name_data["message"]
             clients[client] = name
-            client.send(encode({"type":"users", "message":list(clients.values())}))
+            broadcast_message("users", list(clients.values()), clients)
             broadcast_message("chat", f"{name} joined the chat", clients)
         while True:
             client_response = decode(client.recv(1024))
             if client_response["type"] == "chat":
                 broadcast_message("chat", f"{name}: {client_response['message']}", clients)
-    except ConnectionError:
+
+    except (ConnectionError, ConnectionAbortedError, BrokenPipeError, ConnectionResetError):
         del clients[client]
         client.close()
         broadcast_message("users", list(clients.values()), clients)
@@ -46,7 +51,7 @@ def handle_messages(client, address):
 if __name__ == "__main__":
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    server.bind(("10.79.114.211", 9999))
+    server.bind(("192.168.1.100", 9999))
     server.listen(3)
 
     clients = {}
@@ -54,5 +59,5 @@ if __name__ == "__main__":
     while True:
 
         client, address, = server.accept()
-        thread = threading.Thread(target=handle_messages, args=(client, address))
+        thread = threading.Thread(target=handle_messages, args=(client, address), daemon=True)
         thread.start()
