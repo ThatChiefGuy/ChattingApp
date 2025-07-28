@@ -1,6 +1,7 @@
 import socket
 import threading
 import json
+import os
 
 def encode(message):
     return (json.dumps(message) + "\n").encode()
@@ -49,9 +50,12 @@ def handle_messages(client, address):
 
 
 if __name__ == "__main__":
+
+    host = "0.0.0.0"
+    port = int(os.environ.get("PORT", 9999))
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    server.bind(("192.168.1.100", 9999))
+    server.bind((host, port))
     server.listen(3)
 
     clients = {}

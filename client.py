@@ -3,9 +3,13 @@ import threading
 import customtkinter
 import json
 from tkinter import messagebox
+import os
+
+host = "0.0.0.0"
+port = int(os.environ.get("PORT", 9999))
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect(("192.168.1.100", 9999))
+client.connect((host, port))
 
 def encode(message):
     return (json.dumps(message) + "\n").encode()
