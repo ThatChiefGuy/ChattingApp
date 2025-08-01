@@ -5,11 +5,10 @@ import json
 from tkinter import messagebox
 import os
 
-host = "0.0.0.0"
 port = int(os.environ.get("PORT", 9999))
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect((host, port))
+client.connect(("192.168.1.103", port))
 
 def encode(message):
     return (json.dumps(message) + "\n").encode()
@@ -54,7 +53,7 @@ class App(customtkinter.CTk):
 
         self.online_frame = customtkinter.CTkScrollableFrame(self)
         self.online_frame.place(rely=0.1, relx=0.025, anchor="nw", relheight=0.85, relwidth=0.2)
-        self.online_users_label = customtkinter.CTkLabel(self, text="Online users", font=("Arail", 30))
+        self.online_users_label = customtkinter.CTkLabel(self, text="Online users", font=("Arial", 20))
         self.online_users_label.place(rely=0.05, relx=0.025, anchor="nw")
         threading.Thread(target=self.get_message, daemon=True).start()
 
@@ -69,6 +68,7 @@ class App(customtkinter.CTk):
         except:
             pass
         self.destroy()
+
     def get_message(self):
         buffer = ""
         while True:
